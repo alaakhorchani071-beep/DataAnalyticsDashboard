@@ -1,0 +1,13 @@
+# Environnement virtuel
+.venv/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+
+# Fichiers générés
+Data_Analytics_Report.pdf
+cleaned_data.csv
+
+# VS Code
+.vscode/
