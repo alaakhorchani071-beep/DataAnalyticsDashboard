@@ -2,106 +2,131 @@
 
 ## 📌 Description
 
-Data Analytics Dashboard est une application web interactive développée avec **Python** et **Streamlit**. Elle permet aux utilisateurs d'importer des fichiers CSV ou Excel, de nettoyer les données, de les analyser, de créer des visualisations interactives, d'entraîner un modèle de Machine Learning et de générer un rapport PDF.
+**Data Analytics Dashboard** is an interactive web application developed with **Python and Streamlit** that allows users to analyze, visualize, clean data, apply Machine Learning models, and generate automatic reports.
 
-Ce projet a été réalisé dans le but de mettre en pratique les compétences en analyse de données, visualisation et apprentissage automatique.
-
----
-
-## 🚀 Fonctionnalités
-
-- 📂 Importation de fichiers CSV et Excel
-- 🧹 Nettoyage automatique des données
-  - Suppression des doublons
-  - Gestion des valeurs manquantes
-- 📊 Analyse exploratoire des données
-  - Nombre de lignes
-  - Nombre de colonnes
-  - Valeurs manquantes
-  - Doublons
-  - Statistiques descriptives
-- 📈 Visualisations interactives
-  - Histogramme
-  - Diagramme en barres
-  - Courbe
-  - Diagramme circulaire
-- 🤖 Machine Learning
-  - Régression linéaire
-  - Évaluation du modèle (MSE et R²)
-  - Prédiction à partir de nouvelles valeurs
-- 📄 Génération d'un rapport PDF
-- 📥 Téléchargement des données nettoyées
+This project aims to provide a complete data analysis workflow, from data importation to prediction and reporting.
 
 ---
 
-## 🛠️ Technologies utilisées
+# 🚀 Features
 
+## 📂 Data Importation
+- Import CSV and Excel files.
+- Automatic loading and display of datasets.
+- Data preview.
+
+## 🧹 Data Cleaning
+- Detection and handling of missing values.
+- Data cleaning process.
+- Export cleaned datasets as CSV files.
+
+## 📊 Data Analysis
+- Display general information:
+  - Number of rows.
+  - Number of columns.
+  - Missing values.
+  - Duplicate values.
+- Generate descriptive statistics.
+
+## 📈 Data Visualization
+Interactive visualization with:
+- Histogram.
+- Bar chart.
+- Line chart.
+- Pie chart.
+
+Users can select the column and the type of visualization.
+
+## 🤖 Machine Learning
+- Train a Linear Regression model.
+- Select the target variable.
+- Evaluate the model using:
+  - Mean Squared Error (MSE).
+  - R² Score.
+- Make predictions using user inputs.
+
+## 📄 Automatic Report Generation
+- Generate a PDF report containing:
+  - Dataset information.
+  - Statistical analysis.
+
+---
+
+# 🛠 Technologies Used
+
+## Programming Language
 - Python
-- Streamlit
-- Pandas
-- NumPy
-- Matplotlib
-- Scikit-learn
-- ReportLab
+
+## Libraries
+
+- Pandas → Data manipulation and analysis
+- NumPy → Numerical computation
+- Matplotlib → Data visualization
+- Streamlit → Interactive web application
+- Scikit-learn → Machine Learning models
+
+## Tools
+
+- VS Code
+- Git & GitHub
 
 ---
 
-## 📁 Structure du projet
+# 📁 Project Structure
 
 ```
 DataAnalyticsDashboard/
+
 │
-├── app.py
-├── requirements.txt
-├── README.md
-├── .gitignore
+├── app.py                    # Main Streamlit application
 │
-└── src/
-    ├── analysis.py
-    ├── cleaning.py
-    ├── model.py
-    ├── report.py
-    ├── upload.py
-    └── visualization.py
+├── requirements.txt          # Project dependencies
+│
+├── README.md                 # Project documentation
+│
+├── src/
+│   │
+│   ├── analysis.py           # Statistical analysis functions
+│   ├── cleaning.py           # Data cleaning functions
+│   ├── model.py              # Machine Learning functions
+│   ├── report.py             # PDF report generation
+│   ├── upload.py             # Data loading functions
+│   └── visualization.py      # Visualization functions
+│
+└── Data_Analytics_Report.pdf # Generated report
 ```
 
 ---
 
-## ⚙️ Installation
+# ⚙️ Installation
 
-### 1. Cloner le dépôt
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/alaakhorchani071-beep/DataAnalyticsDashboard.git
 ```
 
-### 2. Accéder au projet
+## 2. Navigate to the project folder
 
 ```bash
 cd DataAnalyticsDashboard
 ```
 
-### 3. Créer un environnement virtuel
+## 3. Create a virtual environment
 
 ```bash
 python -m venv .venv
 ```
 
-### 4. Activer l'environnement virtuel
+## 4. Activate the virtual environment
 
-#### Windows
+Windows:
 
 ```bash
 .venv\Scripts\activate
 ```
 
-#### Linux / macOS
-
-```bash
-source .venv/bin/activate
-```
-
-### 5. Installer les dépendances
+## 5. Install dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -109,64 +134,71 @@ pip install -r requirements.txt
 
 ---
 
-## ▶️ Exécuter l'application
+# ▶️ Run the Application
+
+Launch the Streamlit dashboard:
 
 ```bash
 streamlit run app.py
 ```
 
-L'application sera accessible à l'adresse :
+The application will open automatically in your browser.
+
+---
+
+# 📊 Application Workflow
 
 ```
-http://localhost:8501
+Upload Dataset
+        ↓
+Data Cleaning
+        ↓
+Statistical Analysis
+        ↓
+Visualization
+        ↓
+Machine Learning Prediction
+        ↓
+PDF Report Generation
 ```
 
 ---
 
-## 📸 Aperçu de l'application
+# 🎯 Objectives
 
-Vous pouvez ajouter ici des captures d'écran de votre dashboard.
-
-Exemple :
-
-```
-screenshots/dashboard.png
-```
+- Practice Data Analysis workflow.
+- Develop interactive dashboards.
+- Apply Machine Learning techniques.
+- Improve Python programming skills.
+- Build a complete Data Science project.
 
 ---
 
-## 🎯 Compétences mises en œuvre
-
-- Analyse de données
-- Nettoyage des données
-- Visualisation de données
-- Machine Learning
-- Développement d'applications avec Streamlit
-- Génération de rapports PDF
-- Gestion de projet avec Git et GitHub
-
----
-
-## 📈 Améliorations futures
-
-- Ajout de nouveaux graphiques (Heatmap, Scatter Plot, Box Plot)
-- Support de plusieurs modèles de Machine Learning
-- Tableau de bord avec navigation par onglets
-- Déploiement en ligne
-- Authentification des utilisateurs
-
----
-
-## 👩‍💻 Auteur
+# 👩‍💻 Author
 
 **Alaa Khorchani**
 
-Étudiante en Mathématiques Appliquées – Spécialité Data Science
+Data Science Student
 
-GitHub : https://github.com/alaakhorchani071-beep
+GitHub:
+https://github.com/alaakhorchani071-beep
 
 ---
 
-## 📄 Licence
+# 📌 Future Improvements
 
-Ce projet est publié à des fins d'apprentissage et de démonstration.
+- Add more Machine Learning models:
+  - Decision Tree
+  - Random Forest
+  - Support Vector Machine
+
+- Add advanced visualizations:
+  - Correlation heatmap
+  - Scatter plots
+  - Interactive charts
+
+- Improve dashboard design with custom themes.
+
+---
+
+⭐ If you find this project useful, feel free to give it a star!
