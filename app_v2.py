@@ -43,13 +43,13 @@ Cette application permet :
 
 ✅ Nettoyer les données
 
-✅ Analyser les données
+✅ Analyse statistique
 
-✅ Visualiser les résultats
+✅ Visualisation
 
 ✅ Machine Learning
 
-✅ Générer un rapport PDF
+✅ Rapport PDF
 """)
 
 st.sidebar.markdown("---")
@@ -65,17 +65,18 @@ st.sidebar.info(
 
 st.title("📊 Data Analytics Dashboard")
 
+
 st.write("""
-Bienvenue dans notre application intelligente d'analyse de données.
+Application intelligente d'analyse de données.
 
 Fonctionnalités :
 
 - 📂 Importation CSV / Excel
-- 🧹 Nettoyage des données
+- 🧹 Nettoyage
 - 📊 Analyse statistique
-- 📈 Visualisation interactive
+- 📈 Visualisation
 - 🤖 Machine Learning
-- 📄 Génération de rapports PDF
+- 📄 Rapport PDF
 """)
 
 
@@ -108,335 +109,338 @@ if uploaded_file is not None:
 
 
         # ==========================
-        # APERCU
+        # CREATION DES ONGLETS
         # ==========================
 
-        st.subheader(
-            "📄 Aperçu des données"
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(
+            [
+                "📂 Données",
+                "📊 Analyse",
+                "📈 Visualisation",
+                "🤖 Machine Learning",
+                "📄 Rapport"
+            ]
         )
-
-        st.dataframe(data)
-
-
-        st.divider()
-
-
-        # ==========================
-        # NETTOYAGE
+                # ==========================
+        # ONGLET 1 : DONNEES
         # ==========================
 
-        st.subheader(
-            "🧹 Nettoyage des données"
-        )
+        with tab1:
+
+            st.subheader("📄 Aperçu des données")
+
+            st.dataframe(data)
 
 
-        if st.button(
-            "🧹 Nettoyer les données"
-        ):
+            st.divider()
 
-            with st.spinner(
-                "Nettoyage en cours..."
+
+            st.subheader("🧹 Nettoyage des données")
+
+
+            if st.button(
+                "🧹 Nettoyer les données"
             ):
 
-                cleaned_data = clean_data(data)
+                with st.spinner(
+                    "Nettoyage en cours..."
+                ):
+
+                    cleaned_data = clean_data(data)
 
 
-            st.success(
-                "✅ Données nettoyées !"
+                st.success(
+                    "✅ Données nettoyées avec succès !"
+                )
+
+
+                st.dataframe(
+                    cleaned_data
+                )
+
+
+                csv = cleaned_data.to_csv(
+                    index=False
+                ).encode("utf-8")
+
+
+                st.download_button(
+                    "📥 Télécharger CSV nettoyé",
+                    csv,
+                    "cleaned_data.csv",
+                    "text/csv"
+                )
+
+
+        # ==========================
+        # ONGLET 2 : ANALYSE
+        # ==========================
+
+        with tab2:
+
+            st.subheader(
+                "📊 Informations générales"
             )
+
+
+            info = get_basic_info(data)
+
+
+            col1, col2, col3, col4 = st.columns(4)
+
+
+            col1.metric(
+                "📄 Lignes",
+                info["Nombre de lignes"]
+            )
+
+
+            col2.metric(
+                "📋 Colonnes",
+                info["Nombre de colonnes"]
+            )
+
+
+            col3.metric(
+                "❗ Valeurs manquantes",
+                info["Valeurs manquantes"]
+            )
+
+
+            col4.metric(
+                "🔁 Doublons",
+                info["Doublons"]
+            )
+
+
+            st.divider()
+
+
+            st.subheader(
+                "📈 Statistiques descriptives"
+            )
+
+
+            statistics = get_statistics(data)
 
 
             st.dataframe(
-                cleaned_data
-            )
-
-
-            csv = cleaned_data.to_csv(
-                index=False
-            ).encode("utf-8")
-
-
-            st.download_button(
-                "📥 Télécharger CSV nettoyé",
-                csv,
-                "cleaned_data.csv",
-                "text/csv"
-            )
-
-
-        st.divider()
-
-
-        # ==========================
-        # ANALYSE GENERALE
-        # ==========================
-
-        st.subheader(
-            "📊 Informations générales"
-        )
-
-
-        info = get_basic_info(data)
-
-
-        col1, col2, col3, col4 = st.columns(4)
-
-
-        col1.metric(
-            "📄 Lignes",
-            info["Nombre de lignes"]
-        )
-
-
-        col2.metric(
-            "📋 Colonnes",
-            info["Nombre de colonnes"]
-        )
-
-
-        col3.metric(
-            "❗ Valeurs manquantes",
-            info["Valeurs manquantes"]
-        )
-
-
-        col4.metric(
-            "🔁 Doublons",
-            info["Doublons"]
-        )
-
-
-        st.divider()
-
-
-        # ==========================
-        # STATISTIQUES
-        # ==========================
-
-        st.subheader(
-            "📈 Statistiques descriptives"
-        )
-
-
-        statistics = get_statistics(data)
-
-
-        st.dataframe(
-            statistics
-        )
-
-
-        st.divider()
-
-
-        # ==========================
-        # RAPPORT PDF
-        # ==========================
-
-        st.subheader(
-            "📄 Rapport automatique"
-        )
-
-
-        if st.button(
-            "📄 Créer le rapport PDF"
-        ):
-
-
-            file = generate_report(
-                info,
                 statistics
             )
 
 
-            with open(
-                file,
-                "rb"
-            ) as pdf:
-
-
-                st.download_button(
-                    "📥 Télécharger le rapport PDF",
-                    pdf,
-                    "Data_Analytics_Report.pdf",
-                    "application/pdf"
-                )
-
-
-        st.divider()
-
-
         # ==========================
-        # VISUALISATION
+        # ONGLET 3 : VISUALISATION
         # ==========================
 
-        st.subheader(
-            "📉 Visualisation des données"
-        )
+        with tab3:
 
-
-        selected_column = st.selectbox(
-            "Choisissez une colonne :",
-            data.columns
-        )
-
-
-        chart_type = st.selectbox(
-            "Type de graphique :",
-            [
-                "Histogramme",
-                "Barres",
-                "Courbe",
-                "Diagramme circulaire"
-            ]
-        )
-
-
-        if chart_type == "Histogramme":
-
-            fig = create_histogram(
-                data,
-                selected_column
+            st.subheader(
+                "📈 Visualisation des données"
             )
 
 
-        elif chart_type == "Barres":
-
-            fig = create_bar_chart(
-                data,
-                selected_column
+            selected_column = st.selectbox(
+                "Choisissez une colonne :",
+                data.columns
             )
 
 
-        elif chart_type == "Diagramme circulaire":
-
-            fig = create_pie_chart(
-                data,
-                selected_column
+            chart_type = st.selectbox(
+                "Type de graphique :",
+                [
+                    "Histogramme",
+                    "Barres",
+                    "Courbe",
+                    "Diagramme circulaire"
+                ]
             )
 
 
-        else:
+            if chart_type == "Histogramme":
 
-            fig = create_line_chart(
-                data,
-                selected_column
-            )
-
-
-        st.pyplot(fig)
-
-
-        st.divider()
-
-
-        # ==========================
-        # MACHINE LEARNING
-        # ==========================
-
-        st.subheader(
-            "🤖 Machine Learning"
-        )
-
-
-        numeric_columns = data.select_dtypes(
-            include=["number"]
-        ).columns
-
-
-        if len(numeric_columns) > 1:
-
-
-            target_column = st.selectbox(
-                "Variable à prédire :",
-                numeric_columns
-            )
-
-
-            if st.button(
-                "🚀 Entraîner le modèle"
-            ):
-
-
-                model, mse, r2 = train_linear_model(
+                fig = create_histogram(
                     data,
-                    target_column
+                    selected_column
                 )
 
 
-                st.session_state["model"] = model
-                st.session_state["target"] = target_column
+            elif chart_type == "Barres":
 
-
-                st.success(
-                    "✅ Modèle entraîné avec succès"
+                fig = create_bar_chart(
+                    data,
+                    selected_column
                 )
 
 
-                st.write(
-                    "MSE :",
-                    mse
+            elif chart_type == "Diagramme circulaire":
+
+                fig = create_pie_chart(
+                    data,
+                    selected_column
                 )
 
 
-                st.write(
-                    "R² :",
-                    r2
+            else:
+
+                fig = create_line_chart(
+                    data,
+                    selected_column
                 )
 
 
-            if "model" in st.session_state:
+            st.pyplot(fig)
+                    # ==========================
+        # ONGLET 4 : MACHINE LEARNING
+        # ==========================
+
+        with tab4:
+
+            st.subheader(
+                "🤖 Machine Learning"
+            )
 
 
-                st.subheader(
-                    "🔮 Prédiction"
+            numeric_columns = data.select_dtypes(
+                include=["number"]
+            ).columns
+
+
+            if len(numeric_columns) > 1:
+
+
+                target_column = st.selectbox(
+                    "Variable à prédire :",
+                    numeric_columns
                 )
-
-
-                target = st.session_state["target"]
-
-
-                features = data.drop(
-                    columns=[target]
-                ).select_dtypes(
-                    include=["number"]
-                ).columns
-
-
-                user_input = {}
-
-
-                for feature in features:
-
-                    user_input[feature] = st.number_input(
-                        feature,
-                        value=0.0
-                    )
 
 
                 if st.button(
-                    "🔮 Prédire"
+                    "🚀 Entraîner le modèle"
                 ):
 
 
-                    input_df = pd.DataFrame(
-                        [user_input]
+                    model, mse, r2 = train_linear_model(
+                        data,
+                        target_column
                     )
 
 
-                    prediction = predict_value(
-                        st.session_state["model"],
-                        input_df
-                    )
+                    st.session_state["model"] = model
+                    st.session_state["target"] = target_column
 
 
                     st.success(
-                        f"Résultat : {prediction:.2f}"
+                        "✅ Modèle entraîné avec succès"
                     )
 
 
-        else:
+                    st.write(
+                        "📉 MSE :",
+                        mse
+                    )
 
-            st.warning(
-                "Il faut au moins deux colonnes numériques."
+
+                    st.write(
+                        "📊 R² :",
+                        r2
+                    )
+
+
+                if "model" in st.session_state:
+
+
+                    st.subheader(
+                        "🔮 Faire une prédiction"
+                    )
+
+
+                    target = st.session_state["target"]
+
+
+                    features = data.drop(
+                        columns=[target]
+                    ).select_dtypes(
+                        include=["number"]
+                    ).columns
+
+
+                    user_input = {}
+
+
+                    for feature in features:
+
+                        user_input[feature] = st.number_input(
+                            f"Entrer {feature}",
+                            value=0.0
+                        )
+
+
+                    if st.button(
+                        "🔮 Prédire"
+                    ):
+
+
+                        input_df = pd.DataFrame(
+                            [user_input]
+                        )
+
+
+                        prediction = predict_value(
+                            st.session_state["model"],
+                            input_df
+                        )
+
+
+                        st.success(
+                            f"Résultat prédit : {prediction:.2f}"
+                        )
+
+
+            else:
+
+                st.warning(
+                    "Il faut au moins deux colonnes numériques."
+                )
+
+
+
+        # ==========================
+        # ONGLET 5 : RAPPORT PDF
+        # ==========================
+
+        with tab5:
+
+            st.subheader(
+                "📄 Rapport automatique"
             )
+
+
+            info = get_basic_info(data)
+
+            statistics = get_statistics(data)
+
+
+            if st.button(
+                "📄 Créer le rapport PDF"
+            ):
+
+
+                file = generate_report(
+                    info,
+                    statistics
+                )
+
+
+                with open(
+                    file,
+                    "rb"
+                ) as pdf:
+
+
+                    st.download_button(
+                        label="📥 Télécharger le rapport PDF",
+                        data=pdf,
+                        file_name="Data_Analytics_Report.pdf",
+                        mime="application/pdf"
+                    )
