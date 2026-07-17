@@ -202,3 +202,8 @@ https://github.com/alaakhorchani071-beep
 ---
 
 ⭐ If you find this project useful, feel free to give it a star!
+## 🌐 Live Demo
+
+You can access the application here:
+
+https://TON-LIEN.streamlit.app
