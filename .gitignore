@@ -10,3 +10,18 @@ Data_Analytics_Report.pdf
 cleaned_data.csv
 
 # VS Code 
+# Database
+*.db
+
+# Data files
+*.csv
+
+# Documents
+*.docx
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environment
+# .venv/ 
