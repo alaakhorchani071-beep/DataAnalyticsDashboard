@@ -1,3 +1,4 @@
+from src.auth import login_user, register_user
 from src.database import create_database
 
 from src.visualization import (
@@ -30,12 +31,120 @@ st.set_page_config(
 )
 
 
-# Création base de données
 create_database()
 
 
 # ==========================
-# CHOIX DE LA LANGUE
+# AUTHENTIFICATION
+# ==========================
+
+if "user" not in st.session_state:
+
+    st.sidebar.subheader("🔐 Compte utilisateur")
+
+
+    choice = st.sidebar.selectbox(
+        "Choisir une action",
+        [
+            "Connexion",
+            "Créer un compte"
+        ]
+    )
+
+
+    username = st.sidebar.text_input(
+        "Nom utilisateur"
+    )
+
+
+    password = st.sidebar.text_input(
+        "Mot de passe",
+        type="password"
+    )
+
+
+    if choice == "Créer un compte":
+
+
+        if st.sidebar.button("Créer un compte"):
+
+            result = register_user(
+                username,
+                password
+            )
+
+
+            if result:
+
+                st.session_state["user"] = username
+
+                st.sidebar.success(
+                    "Compte créé avec succès"
+                )
+
+                st.rerun()
+
+
+            else:
+
+                st.sidebar.error(
+                    "Utilisateur existe déjà"
+                )
+
+
+    else:
+
+
+        if st.sidebar.button("Connexion"):
+
+
+            result = login_user(
+                username,
+                password
+            )
+
+
+            if result:
+
+                st.session_state["user"] = username
+
+                st.sidebar.success(
+                    "Connexion réussie"
+                )
+
+                st.rerun()
+
+
+            else:
+
+                st.sidebar.error(
+                    "Identifiants incorrects"
+                )
+
+
+    st.stop()
+
+
+
+# ==========================
+# DECONNEXION
+# ==========================
+
+st.sidebar.success(
+    f"Bienvenue {st.session_state['user']} 👋"
+)
+
+
+if st.sidebar.button("🚪 Déconnexion"):
+
+    del st.session_state["user"]
+
+    st.rerun()
+
+
+
+# ==========================
+# LANGUE
 # ==========================
 
 language = st.sidebar.selectbox(
@@ -43,20 +152,21 @@ language = st.sidebar.selectbox(
     list(translations.keys())
 )
 
+
 t = translations[language]
+
 
 
 # ==========================
 # SIDEBAR
 # ==========================
 
-st.sidebar.title(t["title"])
+st.sidebar.title(
+    t["title"]
+)
+
 
 st.sidebar.markdown("---")
-
-st.sidebar.success(
-    t["welcome"]
-)
 
 
 st.sidebar.write(
@@ -76,11 +186,8 @@ f"""
 )
 
 
-st.sidebar.markdown("---")
-
-
 st.sidebar.info(
-    "Développé par Alaa Khorchani"
+"Développé par Alaa Khorchani"
 )
 
 
@@ -95,7 +202,7 @@ st.title(
 
 
 st.write(
-t["description"]
+    t["description"]
 )
 
 
@@ -114,15 +221,17 @@ st.subheader(
 
 uploaded_file = st.file_uploader(
     t["choose_file"],
-    type=["csv", "xlsx"]
+    type=["csv","xlsx"]
 )
 
 
 
-if uploaded_file is not None:
+if uploaded_file:
 
 
-    data = load_data(uploaded_file)
+    data = load_data(
+        uploaded_file
+    )
 
 
     if data is not None:
@@ -131,9 +240,7 @@ if uploaded_file is not None:
         st.success(
             t["success_upload"]
         )
-                # ==========================
-        # CREATION DES ONGLETS
-        # ==========================
+
 
         tab1, tab2, tab3, tab4, tab5 = st.tabs(
             [
@@ -146,20 +253,21 @@ if uploaded_file is not None:
         )
 
 
+
         # ==========================
-        # ONGLET 1 : DONNEES
+        # DONNEES
         # ==========================
 
         with tab1:
+
 
             st.subheader(
                 t["preview"]
             )
 
+
             st.dataframe(data)
 
-
-            st.divider()
 
 
             st.subheader(
@@ -171,15 +279,14 @@ if uploaded_file is not None:
                 t["clean"]
             ):
 
-                with st.spinner(
-                    t["cleaning"]
-                ):
 
-                    cleaned_data = clean_data(data)
+                cleaned_data = clean_data(
+                    data
+                )
 
 
                 st.success(
-                    t["clean_success"]
+                    "✅ Nettoyage terminé"
                 )
 
 
@@ -188,36 +295,20 @@ if uploaded_file is not None:
                 )
 
 
-                csv = cleaned_data.to_csv(
-                    index=False
-                ).encode("utf-8")
-
-
-                st.download_button(
-                    t["download_clean"],
-                    csv,
-                    "cleaned_data.csv",
-                    "text/csv"
-                )
-
-
 
         # ==========================
-        # ONGLET 2 : ANALYSE
+        # ANALYSE
         # ==========================
 
         with tab2:
 
 
-            st.subheader(
-                t["general_info"]
+            info = get_basic_info(
+                data
             )
 
 
-            info = get_basic_info(data)
-
-
-            col1, col2, col3, col4 = st.columns(4)
+            col1,col2,col3,col4 = st.columns(4)
 
 
             col1.metric(
@@ -244,77 +335,61 @@ if uploaded_file is not None:
             )
 
 
-            st.divider()
-
-
-            st.subheader(
-                t["statistics"]
-            )
-
-
-            statistics = get_statistics(data)
-
-
             st.dataframe(
-                statistics
+                get_statistics(data)
             )
-                    # ==========================
-        # ONGLET 3 : VISUALISATION
+
+
+
+        # ==========================
+        # VISUALISATION
         # ==========================
 
         with tab3:
 
-            st.subheader(
-                t["visualization"]
-            )
 
-
-            selected_column = st.selectbox(
+            column = st.selectbox(
                 t["choose_column"],
                 data.columns
             )
 
 
-            chart_type = st.selectbox(
+            chart = st.selectbox(
                 t["chart_type"],
                 [
-                    t["histogram"],
-                    t["bar"],
-                    t["line"],
-                    t["pie"]
+                    "Histogramme",
+                    "Barres",
+                    "Courbe",
+                    "Diagramme circulaire"
                 ]
             )
 
 
-            if chart_type == t["histogram"]:
+            if chart=="Histogramme":
 
-                fig = create_histogram(
-                    data,
-                    selected_column
+                fig=create_histogram(
+                    data,column
                 )
 
 
-            elif chart_type == t["bar"]:
+            elif chart=="Barres":
 
-                fig = create_bar_chart(
-                    data,
-                    selected_column
+                fig=create_bar_chart(
+                    data,column
                 )
 
 
-            elif chart_type == t["pie"]:
+            elif chart=="Diagramme circulaire":
 
-                fig = create_pie_chart(
-                    data,
-                    selected_column
+                fig=create_pie_chart(
+                    data,column
                 )
 
 
             else:
 
-                fig = create_line_chart(
-                    data,
-                    selected_column
+                fig=create_line_chart(
+                    data,column
                 )
 
 
@@ -323,29 +398,23 @@ if uploaded_file is not None:
 
 
         # ==========================
-        # ONGLET 4 : MACHINE LEARNING
+        # MACHINE LEARNING
         # ==========================
 
         with tab4:
 
 
-            st.subheader(
-                t["machine_learning"]
-            )
-
-
-            numeric_columns = data.select_dtypes(
+            numeric=data.select_dtypes(
                 include=["number"]
             ).columns
 
 
+            if len(numeric)>1:
 
-            if len(numeric_columns) > 1:
 
-
-                target_column = st.selectbox(
+                target=st.selectbox(
                     "Target",
-                    numeric_columns
+                    numeric
                 )
 
 
@@ -354,112 +423,39 @@ if uploaded_file is not None:
                 ):
 
 
-                    model, mse, r2 = train_linear_model(
+                    model,mse,r2=train_linear_model(
                         data,
-                        target_column
+                        target
                     )
 
 
-                    st.session_state["model"] = model
-                    st.session_state["target"] = target_column
+                    st.session_state["model"]=model
+                    st.session_state["target"]=target
 
 
                     st.success(
-                        t["model_success"]
+                        "Modèle entraîné"
                     )
 
 
-                    st.write(
-                        "MSE :",
-                        mse
-                    )
-
-
-                    st.write(
-                        "R² :",
-                        r2
-                    )
-
-
-
-                if "model" in st.session_state:
-
-
-                    st.subheader(
-                        t["predict"]
-                    )
-
-
-                    target = st.session_state["target"]
-
-
-                    features = data.drop(
-                        columns=[target]
-                    ).select_dtypes(
-                        include=["number"]
-                    ).columns
-
-
-
-                    user_input = {}
-
-
-                    for feature in features:
-
-                        user_input[feature] = st.number_input(
-                            feature,
-                            value=0.0
-                        )
-
-
-
-                    if st.button(
-                        t["predict"]
-                    ):
-
-
-                        input_df = pd.DataFrame(
-                            [user_input]
-                        )
-
-
-                        prediction = predict_value(
-                            st.session_state["model"],
-                            input_df
-                        )
-
-
-                        st.success(
-                            f"{t['prediction_result']} : {prediction:.2f}"
-                        )
+                    st.write("MSE :",mse)
+                    st.write("R² :",r2)
 
 
 
             else:
 
                 st.warning(
-                    t["warning_numeric"]
+                    "Il faut deux colonnes numériques"
                 )
 
 
 
-
         # ==========================
-        # ONGLET 5 : RAPPORT PDF
+        # RAPPORT
         # ==========================
 
         with tab5:
-
-
-            st.subheader(
-                t["report"]
-            )
-
-
-            info = get_basic_info(data)
-
-            statistics = get_statistics(data)
-
 
 
             if st.button(
@@ -467,22 +463,19 @@ if uploaded_file is not None:
             ):
 
 
-                file = generate_report(
-                    info,
-                    statistics
+                file=generate_report(
+                    get_basic_info(data),
+                    get_statistics(data)
                 )
 
 
-                with open(
-                    file,
-                    "rb"
-                ) as pdf:
+                with open(file,"rb") as pdf:
 
 
                     st.download_button(
                         t["download_report"],
                         pdf,
-                        "Data_Analytics_Report.pdf",
+                        "report.pdf",
                         "application/pdf"
                     )
-                    
+                

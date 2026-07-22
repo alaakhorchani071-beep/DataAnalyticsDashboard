@@ -5,12 +5,44 @@ import bcrypt
 DATABASE_NAME = "database.db"
 
 
-def create_user(first_name, last_name, email, password, language):
 
-    connection = sqlite3.connect(DATABASE_NAME)
+# ==========================
+# CREER UN UTILISATEUR
+# ==========================
+
+def register_user(username, password):
+
+    connection = sqlite3.connect(
+        DATABASE_NAME
+    )
 
     cursor = connection.cursor()
 
+
+    # Vérifier si l'utilisateur existe
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM users
+        WHERE username = ?
+        """,
+        (username,)
+    )
+
+
+    existing_user = cursor.fetchone()
+
+
+    if existing_user:
+
+        connection.close()
+
+        return False
+
+
+
+    # Crypter le mot de passe
 
     hashed_password = bcrypt.hashpw(
         password.encode("utf-8"),
@@ -18,45 +50,41 @@ def create_user(first_name, last_name, email, password, language):
     )
 
 
-    try:
+    cursor.execute(
+        """
+        INSERT INTO users
+        (username, password)
 
-        cursor.execute(
-            """
-            INSERT INTO users
-            (first_name, last_name, email, password, language)
+        VALUES (?, ?)
+        """,
 
-            VALUES (?, ?, ?, ?, ?)
-            """,
-
-            (
-                first_name,
-                last_name,
-                email,
-                hashed_password,
-                language
-            )
+        (
+            username,
+            hashed_password
         )
+    )
 
 
-        connection.commit()
+    connection.commit()
 
-        return True
-
-
-    except sqlite3.IntegrityError:
-
-        return False
+    connection.close()
 
 
-    finally:
-
-        connection.close()
+    return True
 
 
 
-def login_user(email, password):
 
-    connection = sqlite3.connect(DATABASE_NAME)
+
+# ==========================
+# CONNEXION UTILISATEUR
+# ==========================
+
+def login_user(username, password):
+
+    connection = sqlite3.connect(
+        DATABASE_NAME
+    )
 
     cursor = connection.cursor()
 
@@ -65,10 +93,10 @@ def login_user(email, password):
         """
         SELECT *
         FROM users
-        WHERE email = ?
+        WHERE username = ?
         """,
 
-        (email,)
+        (username,)
     )
 
 
@@ -80,7 +108,8 @@ def login_user(email, password):
 
     if user:
 
-        stored_password = user[4]
+
+        stored_password = user[2]
 
 
         if bcrypt.checkpw(
@@ -88,7 +117,7 @@ def login_user(email, password):
             stored_password
         ):
 
-            return user
+            return True
 
 
-    return None
+    return False
