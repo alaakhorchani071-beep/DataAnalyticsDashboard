@@ -98,6 +98,8 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file is not None:
 
+    st.write("📄 Fichier sélectionné :", uploaded_file.name)
+
     data = load_data(uploaded_file)
 
 

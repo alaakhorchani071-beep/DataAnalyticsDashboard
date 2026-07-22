@@ -1,3 +1,5 @@
+from src.database import create_database
+
 from src.visualization import (
     create_histogram,
     create_bar_chart,
@@ -10,6 +12,8 @@ from src.upload import load_data
 from src.model import train_linear_model, predict_value
 from src.cleaning import clean_data
 from src.report import generate_report
+
+from translations import translations
 
 import streamlit as st
 import pandas as pd
@@ -26,108 +30,131 @@ st.set_page_config(
 )
 
 
+# Création base de données
+create_database()
+
+
+# ==========================
+# CHOIX DE LA LANGUE
+# ==========================
+
+language = st.sidebar.selectbox(
+    "🌍 Language",
+    list(translations.keys())
+)
+
+t = translations[language]
+
+
 # ==========================
 # SIDEBAR
 # ==========================
 
-st.sidebar.title("📊 Data Analytics Dashboard")
+st.sidebar.title(t["title"])
 
 st.sidebar.markdown("---")
 
-st.sidebar.success("Bienvenue !")
+st.sidebar.success(
+    t["welcome"]
+)
 
-st.sidebar.write("""
-Cette application permet :
 
-✅ Importer des données
+st.sidebar.write(
+f"""
+✅ {t["import"]}
 
-✅ Nettoyer les données
+✅ {t["clean"]}
 
-✅ Analyse statistique
+✅ {t["analysis"]}
 
-✅ Visualisation
+✅ {t["visualization"]}
 
-✅ Machine Learning
+✅ {t["machine_learning"]}
 
-✅ Rapport PDF
-""")
+✅ {t["report"]}
+"""
+)
+
 
 st.sidebar.markdown("---")
+
 
 st.sidebar.info(
     "Développé par Alaa Khorchani"
 )
 
 
+
 # ==========================
 # TITRE
 # ==========================
 
-st.title("📊 Data Analytics Dashboard")
+st.title(
+    t["title"]
+)
 
 
-st.write("""
-Application intelligente d'analyse de données.
-
-Fonctionnalités :
-
-- 📂 Importation CSV / Excel
-- 🧹 Nettoyage
-- 📊 Analyse statistique
-- 📈 Visualisation
-- 🤖 Machine Learning
-- 📄 Rapport PDF
-""")
+st.write(
+t["description"]
+)
 
 
 st.divider()
+
 
 
 # ==========================
 # IMPORTATION
 # ==========================
 
-st.subheader("📂 Importer vos données")
+st.subheader(
+    t["upload"]
+)
 
 
 uploaded_file = st.file_uploader(
-    "Choisissez un fichier CSV ou Excel",
+    t["choose_file"],
     type=["csv", "xlsx"]
 )
 
 
+
 if uploaded_file is not None:
+
 
     data = load_data(uploaded_file)
 
 
     if data is not None:
 
+
         st.success(
-            "✅ Fichier chargé avec succès !"
+            t["success_upload"]
         )
-
-
-        # ==========================
+                # ==========================
         # CREATION DES ONGLETS
         # ==========================
 
         tab1, tab2, tab3, tab4, tab5 = st.tabs(
             [
-                "📂 Données",
-                "📊 Analyse",
-                "📈 Visualisation",
-                "🤖 Machine Learning",
-                "📄 Rapport"
+                t["data"],
+                t["analysis"],
+                t["visualization"],
+                t["machine_learning"],
+                t["report"]
             ]
         )
-                # ==========================
+
+
+        # ==========================
         # ONGLET 1 : DONNEES
         # ==========================
 
         with tab1:
 
-            st.subheader("📄 Aperçu des données")
+            st.subheader(
+                t["preview"]
+            )
 
             st.dataframe(data)
 
@@ -135,22 +162,24 @@ if uploaded_file is not None:
             st.divider()
 
 
-            st.subheader("🧹 Nettoyage des données")
+            st.subheader(
+                t["clean"]
+            )
 
 
             if st.button(
-                "🧹 Nettoyer les données"
+                t["clean"]
             ):
 
                 with st.spinner(
-                    "Nettoyage en cours..."
+                    t["cleaning"]
                 ):
 
                     cleaned_data = clean_data(data)
 
 
                 st.success(
-                    "✅ Données nettoyées avec succès !"
+                    t["clean_success"]
                 )
 
 
@@ -165,11 +194,12 @@ if uploaded_file is not None:
 
 
                 st.download_button(
-                    "📥 Télécharger CSV nettoyé",
+                    t["download_clean"],
                     csv,
                     "cleaned_data.csv",
                     "text/csv"
                 )
+
 
 
         # ==========================
@@ -178,8 +208,9 @@ if uploaded_file is not None:
 
         with tab2:
 
+
             st.subheader(
-                "📊 Informations générales"
+                t["general_info"]
             )
 
 
@@ -190,25 +221,25 @@ if uploaded_file is not None:
 
 
             col1.metric(
-                "📄 Lignes",
+                t["rows"],
                 info["Nombre de lignes"]
             )
 
 
             col2.metric(
-                "📋 Colonnes",
+                t["columns"],
                 info["Nombre de colonnes"]
             )
 
 
             col3.metric(
-                "❗ Valeurs manquantes",
+                t["missing"],
                 info["Valeurs manquantes"]
             )
 
 
             col4.metric(
-                "🔁 Doublons",
+                t["duplicates"],
                 info["Doublons"]
             )
 
@@ -217,7 +248,7 @@ if uploaded_file is not None:
 
 
             st.subheader(
-                "📈 Statistiques descriptives"
+                t["statistics"]
             )
 
 
@@ -227,37 +258,35 @@ if uploaded_file is not None:
             st.dataframe(
                 statistics
             )
-
-
-        # ==========================
+                    # ==========================
         # ONGLET 3 : VISUALISATION
         # ==========================
 
         with tab3:
 
             st.subheader(
-                "📈 Visualisation des données"
+                t["visualization"]
             )
 
 
             selected_column = st.selectbox(
-                "Choisissez une colonne :",
+                t["choose_column"],
                 data.columns
             )
 
 
             chart_type = st.selectbox(
-                "Type de graphique :",
+                t["chart_type"],
                 [
-                    "Histogramme",
-                    "Barres",
-                    "Courbe",
-                    "Diagramme circulaire"
+                    t["histogram"],
+                    t["bar"],
+                    t["line"],
+                    t["pie"]
                 ]
             )
 
 
-            if chart_type == "Histogramme":
+            if chart_type == t["histogram"]:
 
                 fig = create_histogram(
                     data,
@@ -265,7 +294,7 @@ if uploaded_file is not None:
                 )
 
 
-            elif chart_type == "Barres":
+            elif chart_type == t["bar"]:
 
                 fig = create_bar_chart(
                     data,
@@ -273,7 +302,7 @@ if uploaded_file is not None:
                 )
 
 
-            elif chart_type == "Diagramme circulaire":
+            elif chart_type == t["pie"]:
 
                 fig = create_pie_chart(
                     data,
@@ -290,14 +319,18 @@ if uploaded_file is not None:
 
 
             st.pyplot(fig)
-                    # ==========================
+
+
+
+        # ==========================
         # ONGLET 4 : MACHINE LEARNING
         # ==========================
 
         with tab4:
 
+
             st.subheader(
-                "🤖 Machine Learning"
+                t["machine_learning"]
             )
 
 
@@ -306,17 +339,18 @@ if uploaded_file is not None:
             ).columns
 
 
+
             if len(numeric_columns) > 1:
 
 
                 target_column = st.selectbox(
-                    "Variable à prédire :",
+                    "Target",
                     numeric_columns
                 )
 
 
                 if st.button(
-                    "🚀 Entraîner le modèle"
+                    t["train"]
                 ):
 
 
@@ -331,27 +365,28 @@ if uploaded_file is not None:
 
 
                     st.success(
-                        "✅ Modèle entraîné avec succès"
+                        t["model_success"]
                     )
 
 
                     st.write(
-                        "📉 MSE :",
+                        "MSE :",
                         mse
                     )
 
 
                     st.write(
-                        "📊 R² :",
+                        "R² :",
                         r2
                     )
+
 
 
                 if "model" in st.session_state:
 
 
                     st.subheader(
-                        "🔮 Faire une prédiction"
+                        t["predict"]
                     )
 
 
@@ -365,19 +400,21 @@ if uploaded_file is not None:
                     ).columns
 
 
+
                     user_input = {}
 
 
                     for feature in features:
 
                         user_input[feature] = st.number_input(
-                            f"Entrer {feature}",
+                            feature,
                             value=0.0
                         )
 
 
+
                     if st.button(
-                        "🔮 Prédire"
+                        t["predict"]
                     ):
 
 
@@ -393,15 +430,17 @@ if uploaded_file is not None:
 
 
                         st.success(
-                            f"Résultat prédit : {prediction:.2f}"
+                            f"{t['prediction_result']} : {prediction:.2f}"
                         )
+
 
 
             else:
 
                 st.warning(
-                    "Il faut au moins deux colonnes numériques."
+                    t["warning_numeric"]
                 )
+
 
 
 
@@ -411,8 +450,9 @@ if uploaded_file is not None:
 
         with tab5:
 
+
             st.subheader(
-                "📄 Rapport automatique"
+                t["report"]
             )
 
 
@@ -421,8 +461,9 @@ if uploaded_file is not None:
             statistics = get_statistics(data)
 
 
+
             if st.button(
-                "📄 Créer le rapport PDF"
+                t["create_report"]
             ):
 
 
@@ -439,8 +480,9 @@ if uploaded_file is not None:
 
 
                     st.download_button(
-                        label="📥 Télécharger le rapport PDF",
-                        data=pdf,
-                        file_name="Data_Analytics_Report.pdf",
-                        mime="application/pdf"
+                        t["download_report"],
+                        pdf,
+                        "Data_Analytics_Report.pdf",
+                        "application/pdf"
                     )
+                    
