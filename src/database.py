@@ -14,6 +14,8 @@ def create_database():
     cursor = connection.cursor()
 
 
+    # Table utilisateurs
+
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS users(
@@ -22,14 +24,42 @@ def create_database():
 
             username TEXT UNIQUE,
 
-            password TEXT
+            email TEXT,
+
+            password TEXT,
+
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+            language TEXT DEFAULT 'English'
 
         )
         """
     )
 
 
+
+    # Table historique
+
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS history(
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            username TEXT,
+
+            filename TEXT,
+
+            action TEXT,
+
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+        )
+        """
+    )
+
+
+
     connection.commit()
 
     connection.close()
-    

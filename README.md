@@ -2,73 +2,148 @@
 
 ## 📌 Description
 
-**Data Analytics Dashboard** is an interactive web application developed with **Python and Streamlit** that allows users to analyze, visualize, clean data, apply Machine Learning models, and generate automatic reports.
+**Data Analytics Dashboard** is an interactive Data Science web application developed with **Python and Streamlit**.
 
-This project aims to provide a complete data analysis workflow, from data importation to prediction and reporting.
+The application provides a complete data analysis workflow, including data importation, cleaning, visualization, Machine Learning modeling, prediction, and automatic PDF report generation.
+
+The objective of this project is to transform raw datasets into meaningful insights through an interactive dashboard.
 
 ---
 
 # 🚀 Features
 
 ## 📂 Data Importation
+
 - Import CSV and Excel files.
-- Automatic loading and display of datasets.
-- Data preview.
+- Automatic dataset loading.
+- Dataset preview.
+- Display dataset information.
+
+---
 
 ## 🧹 Data Cleaning
-- Detection and handling of missing values.
-- Data cleaning process.
-- Export cleaned datasets as CSV files.
+
+- Detect missing values.
+- Handle missing data.
+- Remove duplicates.
+- Export cleaned datasets.
+
+---
 
 ## 📊 Data Analysis
-- Display general information:
-  - Number of rows.
-  - Number of columns.
-  - Missing values.
-  - Duplicate values.
-- Generate descriptive statistics.
+
+The dashboard provides:
+
+- Number of rows.
+- Number of columns.
+- Missing values.
+- Duplicate values.
+- Data types information.
+- Descriptive statistics.
+
+---
 
 ## 📈 Data Visualization
-Interactive visualization with:
+
+Interactive visualizations including:
+
 - Histogram.
 - Bar chart.
 - Line chart.
 - Pie chart.
 
-Users can select the column and the type of visualization.
+Users can select:
+- The column to analyze.
+- The visualization type.
 
-## 🤖 Machine Learning
-- Train a Linear Regression model.
-- Select the target variable.
-- Evaluate the model using:
-  - Mean Squared Error (MSE).
-  - R² Score.
-- Make predictions using user inputs.
+---
 
-## 📄 Automatic Report Generation
-- Generate a PDF report containing:
-  - Dataset information.
-  - Statistical analysis.
+# 🤖 Machine Learning
+
+The application supports multiple regression models:
+
+- Linear Regression.
+- Decision Tree Regressor.
+- Random Forest Regressor.
+
+Features:
+
+- Select target variable.
+- Select feature variables.
+- Train Machine Learning models.
+- Evaluate model performance.
+
+Evaluation metrics:
+
+- MAE (Mean Absolute Error).
+- RMSE (Root Mean Square Error).
+- R² Score.
+
+Additional features:
+
+- Actual vs Prediction visualization.
+- Feature importance analysis.
+- Save trained model for future predictions.
+
+---
+
+# 🔮 Prediction
+
+Users can:
+
+- Load the trained model.
+- Enter new input values.
+- Generate predictions.
+
+---
+
+# 📄 Automatic Report Generation
+
+Generate professional PDF reports containing:
+
+- Dataset information.
+- Statistical analysis.
+- Data visualizations.
+- Machine Learning results.
+
+The generated report can be:
+
+- Previewed directly inside the application.
+- Downloaded as PDF.
+
+---
+
+# 🕒 History Management
+
+The application stores user actions using SQLite:
+
+- Generated reports history.
+- User activity tracking.
 
 ---
 
 # 🛠 Technologies Used
 
 ## Programming Language
+
 - Python
 
 ## Libraries
 
-- Pandas → Data manipulation and analysis
+- Pandas → Data manipulation
 - NumPy → Numerical computation
 - Matplotlib → Data visualization
-- Streamlit → Interactive web application
+- Streamlit → Interactive dashboard
 - Scikit-learn → Machine Learning models
+- ReportLab → PDF generation
+- SQLite → Database management
+- Joblib → Model saving
 
 ## Tools
 
 - VS Code
-- Git & GitHub
+- Git
+- GitHub
 
 ---
 
@@ -78,47 +153,61 @@ Users can select the column and the type of visualization.
 DataAnalyticsDashboard/
 
 │
-├── app.py                    # Main Streamlit application
+├── app.py
 │
-├── requirements.txt          # Project dependencies
-│
-├── README.md                 # Project documentation
+├── pages/
+│   │
+│   ├── 1_📊_Dashboard.py
+│   ├── 2_📂_Upload.py
+│   ├── 3_🧹_Cleaning.py
+│   ├── 4_📈_Visualization.py
+│   ├── 5_🤖_Machine_Learning.py
+│   ├── 6_🔮_Prediction.py
+│   ├── 7_📄_Report.py
+│   └── 8_🕒_History.py
 │
 ├── src/
 │   │
-│   ├── analysis.py           # Statistical analysis functions
-│   ├── cleaning.py           # Data cleaning functions
-│   ├── model.py              # Machine Learning functions
-│   ├── report.py             # PDF report generation
-│   ├── upload.py             # Data loading functions
-│   └── visualization.py      # Visualization functions
+│   ├── analysis.py
+│   ├── cleaning.py
+│   ├── model.py
+│   ├── report.py
+│   ├── upload.py
+│   └── visualization.py
 │
-└── Data_Analytics_Report.pdf # Generated report
+├── models/
+│   └── model.pkl
+│
+├── database.db
+│
+├── requirements.txt
+│
+└── README.md
 ```
 
 ---
 
 # ⚙️ Installation
 
-## 1. Clone the repository
+Clone the repository:
 
 ```bash
 git clone https://github.com/alaakhorchani071-beep/DataAnalyticsDashboard.git
 ```
 
-## 2. Navigate to the project folder
+Navigate to the project folder:
 
 ```bash
 cd DataAnalyticsDashboard
 ```
 
-## 3. Create a virtual environment
+Create a virtual environment:
 
 ```bash
 python -m venv .venv
 ```
 
-## 4. Activate the virtual environment
+Activate the environment:
 
 Windows:
 
@@ -126,7 +215,7 @@ Windows:
 .venv\Scripts\activate
 ```
 
-## 5. Install dependencies
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -136,13 +225,13 @@ pip install -r requirements.txt
 
 # ▶️ Run the Application
 
-Launch the Streamlit dashboard:
+Start Streamlit:
 
 ```bash
 streamlit run app.py
 ```
 
-The application will open automatically in your browser.
+The dashboard will open automatically in your browser.
 
 ---
 
@@ -153,11 +242,13 @@ Upload Dataset
         ↓
 Data Cleaning
         ↓
-Statistical Analysis
+Data Analysis
         ↓
 Visualization
         ↓
-Machine Learning Prediction
+Machine Learning Training
+        ↓
+Prediction
         ↓
 PDF Report Generation
 ```
@@ -166,11 +257,11 @@ PDF Report Generation
 
 # 🎯 Objectives
 
-- Practice Data Analysis workflow.
-- Develop interactive dashboards.
-- Apply Machine Learning techniques.
-- Improve Python programming skills.
-- Build a complete Data Science project.
+- Develop a complete Data Science application.
+- Practice data analysis workflows.
+- Apply Machine Learning models.
+- Create interactive dashboards.
+- Improve Python and Streamlit skills.
 
 ---
 
@@ -185,25 +276,10 @@ https://github.com/alaakhorchani071-beep
 
 ---
 
-# 📌 Future Improvements
+# 🚀 Future Improvements
 
-- Add more Machine Learning models:
-  - Decision Tree
-  - Random Forest
-  - Support Vector Machine
-
-- Add advanced visualizations:
-  - Correlation heatmap
-  - Scatter plots
-  - Interactive charts
-
-- Improve dashboard design with custom themes.
-
----
-
-⭐ If you find this project useful, feel free to give it a star!
-## 🌐 Live Demo
-
-You can access the application here:
-
-https://TON-LIEN.streamlit.app
+- Add classification models.
+- Add correlation heatmaps.
+- Add interactive Plotly visualizations.
+- Deploy the application online.
+- Improve UI/UX design.
