@@ -24,4 +24,9 @@ __pycache__/
 *.pyc
 
 # Virtual environment
-# .venv/ 
+# .venv/
+models/
+*.pkl
+database.db
+__pycache__/
+.venv/
