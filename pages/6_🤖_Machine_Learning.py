@@ -38,7 +38,7 @@ st.title(
 
 
 # ==========================
-# VERIFICATION DATA
+# CHECK DATA
 # ==========================
 
 if "data" not in st.session_state:
@@ -84,6 +84,7 @@ st.subheader(
 )
 
 
+
 target = st.selectbox(
     "🎯 Target column",
     numeric_columns
@@ -118,7 +119,124 @@ y = data[target]
 
 
 # ==========================
-# SELECT MODEL
+# TRAIN TEST SPLIT
+# ==========================
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+
+
+# ==========================
+# MODEL COMPARISON
+# ==========================
+
+st.subheader(
+    "🏆 Compare Models"
+)
+
+
+
+if st.button(
+    "🚀 Compare All Models"
+):
+
+
+    models = {
+
+        "Linear Regression":
+        LinearRegression(),
+
+        "Decision Tree":
+        DecisionTreeRegressor(
+            random_state=42
+        ),
+
+        "Random Forest":
+        RandomForestRegressor(
+            random_state=42
+        )
+
+    }
+
+
+    comparison_results = []
+
+
+    for name, model_test in models.items():
+
+
+        model_test.fit(
+            X_train,
+            y_train
+        )
+
+
+        prediction = model_test.predict(
+            X_test
+        )
+
+
+        mae = mean_absolute_error(
+            y_test,
+            prediction
+        )
+
+
+        rmse = mean_squared_error(
+            y_test,
+            prediction
+        ) ** 0.5
+
+
+        r2 = r2_score(
+            y_test,
+            prediction
+        )
+
+
+        comparison_results.append(
+            {
+                "Model": name,
+                "MAE": round(mae,3),
+                "RMSE": round(rmse,3),
+                "R² Score": round(r2,3)
+            }
+        )
+
+
+
+    comparison = pd.DataFrame(
+        comparison_results
+    )
+
+
+    st.dataframe(
+        comparison,
+        use_container_width=True
+    )
+
+
+
+    best = comparison.loc[
+        comparison["R² Score"].idxmax()
+    ]
+
+
+
+    st.success(
+        f"🏆 Best Model : {best['Model']} "
+        f"(R² = {best['R² Score']})"
+    )
+
+
+
+# ==========================
+# CHOOSE MODEL
 # ==========================
 
 st.subheader(
@@ -159,19 +277,6 @@ else:
 
 
 # ==========================
-# TRAIN TEST SPLIT
-# ==========================
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.2,
-    random_state=42
-)
-
-
-
-# ==========================
 # TRAIN MODEL
 # ==========================
 
@@ -186,15 +291,12 @@ if st.button(
     )
 
 
+
     predictions = model.predict(
         X_test
     )
 
 
-
-    # ==========================
-    # METRICS
-    # ==========================
 
     mae = mean_absolute_error(
         y_test,
@@ -202,13 +304,10 @@ if st.button(
     )
 
 
-    mse = mean_squared_error(
+    rmse = mean_squared_error(
         y_test,
         predictions
-    )
-
-
-    rmse = mse ** 0.5
+    ) ** 0.5
 
 
     r2 = r2_score(
@@ -221,6 +320,7 @@ if st.button(
     # ==========================
     # SAVE MODEL
     # ==========================
+
 
     if not os.path.exists(
         "models"
@@ -254,9 +354,9 @@ if st.button(
 
 
     # ==========================
-    # SAVE ML RESULTS
-    # FOR PDF REPORT
+    # SAVE RESULTS
     # ==========================
+
 
     st.session_state["ml_results"] = {
 
@@ -275,13 +375,13 @@ if st.button(
 
 
     st.success(
-        "✅ Model trained and saved successfully!"
+        "✅ Model trained and saved!"
     )
 
 
 
     # ==========================
-    # PERFORMANCE
+    # METRICS
     # ==========================
 
     st.subheader(
@@ -289,25 +389,25 @@ if st.button(
     )
 
 
-    c1, c2, c3, c4 = st.columns(4)
+    c1,c2,c3,c4 = st.columns(4)
 
 
 
     c1.metric(
         "MAE",
-        round(mae, 3)
+        round(mae,3)
     )
 
 
     c2.metric(
         "RMSE",
-        round(rmse, 3)
+        round(rmse,3)
     )
 
 
     c3.metric(
         "R² Score",
-        round(r2, 3)
+        round(r2,3)
     )
 
 
@@ -319,7 +419,7 @@ if st.button(
 
 
     # ==========================
-    # ACTUAL VS PREDICTION
+    # GRAPH
     # ==========================
 
     st.subheader(
@@ -373,9 +473,7 @@ if st.button(
         importance = pd.DataFrame(
             {
                 "Feature": features,
-
-                "Importance":
-                model.feature_importances_
+                "Importance": model.feature_importances_
             }
         )
 
@@ -395,7 +493,7 @@ if st.button(
 
 
     # ==========================
-    # PREDICTION TABLE
+    # PREDICTIONS TABLE
     # ==========================
 
     st.subheader(
@@ -403,16 +501,15 @@ if st.button(
     )
 
 
-    results = pd.DataFrame(
+    result = pd.DataFrame(
         {
             "Actual": y_test,
-
             "Prediction": predictions
         }
     )
 
 
     st.dataframe(
-        results,
+        result,
         use_container_width=True
     )

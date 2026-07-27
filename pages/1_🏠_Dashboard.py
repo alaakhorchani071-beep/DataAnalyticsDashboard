@@ -163,9 +163,90 @@ st.dataframe(
 
 
 st.divider()
+# ==========================
+# DATA INSIGHTS
+# ==========================
+
+st.subheader(
+    "💡 Data Insights"
+)
+
+
+numeric_columns = data.select_dtypes(
+    include=["number"]
+).columns
+
+
+text_columns = data.select_dtypes(
+    include=["object"]
+).columns
 
 
 
+col1, col2, col3, col4 = st.columns(4)
+
+
+
+col1.metric(
+    "🔢 Numeric Columns",
+    len(numeric_columns)
+)
+
+
+col2.metric(
+    "🔤 Text Columns",
+    len(text_columns)
+)
+
+
+col3.metric(
+    "💾 Dataset Size",
+    f"{round(data.memory_usage().sum()/1024,2)} KB"
+)
+
+
+missing_column = (
+    data.isnull()
+    .sum()
+    .idxmax()
+)
+
+
+col4.metric(
+    "⚠️ Most Missing",
+    missing_column
+)
+# ==========================
+# AUTOMATIC CHART
+# ==========================
+
+st.subheader(
+    "📈 Automatic Visualization"
+)
+
+
+numeric = data.select_dtypes(
+    include=["number"]
+)
+
+
+if len(numeric.columns) > 0:
+
+    selected = st.selectbox(
+        "Choose numerical column",
+        numeric.columns
+    )
+
+
+    st.line_chart(
+        numeric[selected]
+    )
+
+else:
+
+    st.info(
+        "No numerical columns available."
+    )
 # ==========================
 # MACHINE LEARNING SUMMARY
 # ==========================
