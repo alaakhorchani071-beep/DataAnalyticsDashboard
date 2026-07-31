@@ -3,7 +3,27 @@ import joblib
 import pandas as pd
 import os
 
+from src.logo import show_logo
+from translations import translations
 
+
+
+# ==========================
+# LANGUAGE SYSTEM
+# ==========================
+
+language = st.session_state.get(
+    "language",
+    "Français"
+)
+
+t = translations[language]
+
+
+
+# ==========================
+# CONFIGURATION
+# ==========================
 
 st.set_page_config(
     page_title="Prediction",
@@ -12,8 +32,21 @@ st.set_page_config(
 )
 
 
+# LOGO
+
+show_logo()
+
+
+
+# ==========================
+# TITLE
+# ==========================
+
 st.title(
-    "🔮 Prediction"
+    t.get(
+        "prediction",
+        "🔮 Prediction"
+    )
 )
 
 
@@ -29,18 +62,24 @@ model_path = "models/model.pkl"
 if not os.path.exists(model_path):
 
     st.warning(
-        "⚠️ Please train a model first."
+        t.get(
+            "train_first",
+            "⚠️ Please train a model first."
+        )
     )
 
     st.stop()
 
 
 
-# Load model
+# ==========================
+# LOAD MODEL
+# ==========================
 
 saved_model = joblib.load(
     model_path
 )
+
 
 
 model = saved_model["model"]
@@ -49,8 +88,15 @@ features = saved_model["features"]
 
 
 
+# ==========================
+# INPUT VALUES
+# ==========================
+
 st.subheader(
-    "Enter values"
+    t.get(
+        "enter_values",
+        "✏️ Enter values"
+    )
 )
 
 
@@ -62,12 +108,15 @@ input_data = {}
 for feature in features:
 
     input_data[feature] = st.number_input(
-        feature
+        feature,
+        value=0.0
     )
 
 
 
-# Convert input
+# ==========================
+# CONVERT DATA
+# ==========================
 
 input_df = pd.DataFrame(
     [input_data]
@@ -75,10 +124,15 @@ input_df = pd.DataFrame(
 
 
 
-# Prediction
+# ==========================
+# PREDICTION
+# ==========================
 
 if st.button(
-    "🔮 Predict"
+    t.get(
+        "predict",
+        "🔮 Predict"
+    )
 ):
 
 
@@ -87,15 +141,26 @@ if st.button(
     )
 
 
+
     st.success(
-        "Prediction completed!"
+        t.get(
+            "prediction_success",
+            "✅ Prediction completed successfully"
+        )
     )
 
 
+
     st.metric(
-        "Predicted Value",
+
+        t.get(
+            "prediction_result",
+            "Prediction Result"
+        ),
+
         round(
             prediction[0],
             2
         )
+
     )

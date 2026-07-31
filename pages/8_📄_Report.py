@@ -2,14 +2,15 @@ import streamlit as st
 import sqlite3
 import base64
 
-
+from src.logo import show_logo
 from src.analysis import get_basic_info, get_statistics
 from src.report import generate_report
 
+from translations import translations
 
 
 # ==========================
-# CONFIGURATION PAGE
+# CONFIGURATION
 # ==========================
 
 st.set_page_config(
@@ -19,20 +20,44 @@ st.set_page_config(
 )
 
 
+# ==========================
+# LANGUAGE SYSTEM
+# ==========================
+
+language = st.session_state.get(
+    "language",
+    "Français"
+)
+
+t = translations[language]
+
+
+# ==========================
+# LOGO
+# ==========================
+
+show_logo()
+
+
+
+# ==========================
+# TITLE
+# ==========================
+
 st.title(
-    "📄 Data Analytics Report"
+    t.get("report", "📄 Report")
 )
 
 
 
 # ==========================
-# VERIFICATION USER
+# CHECK USER
 # ==========================
 
 if "user" not in st.session_state:
 
     st.warning(
-        "⚠️ Please login first."
+        "⚠️ " + t.get("login", "Login required")
     )
 
     st.stop()
@@ -44,13 +69,16 @@ username = st.session_state["user"]
 
 
 # ==========================
-# VERIFICATION DATA
+# CHECK DATA
 # ==========================
 
 if "data" not in st.session_state:
 
     st.info(
-        "📂 Please upload data first."
+        t.get(
+            "upload_first",
+            "📂 Please upload data first."
+        )
     )
 
     st.stop()
@@ -76,14 +104,18 @@ statistics = get_statistics(data)
 # ==========================
 
 st.subheader(
-    "👁️ Report Preview"
+    t.get(
+        "report_preview",
+        "👁️ Report Preview"
+    )
 )
 
 
 
 st.write(
-    "### 📌 General Information"
+    f"### 📌 {t.get('general_info','General Information')}"
 )
+
 
 
 for key, value in info.items():
@@ -99,8 +131,9 @@ st.divider()
 
 
 st.write(
-    "### 📊 Descriptive Statistics"
+    f"### 📊 {t.get('statistics','Statistics')}"
 )
+
 
 
 st.dataframe(
@@ -111,14 +144,15 @@ st.dataframe(
 
 
 # ==========================
-# ML RESULTS PREVIEW
+# MACHINE LEARNING RESULTS
 # ==========================
 
 st.divider()
 
 
+
 st.write(
-    "### 🤖 Machine Learning Results"
+    f"### 🤖 {t.get('ml_results','Machine Learning Results')}"
 )
 
 
@@ -130,7 +164,10 @@ if "ml_results" in st.session_state:
 
 
     st.success(
-        "✅ ML results available"
+        t.get(
+            "ml_available",
+            "✅ ML results available"
+        )
     )
 
 
@@ -150,23 +187,23 @@ if "ml_results" in st.session_state:
 
 
     st.write(
-        f"**R² Score :** {round(ml_results['r2'],3)}"
+        f"**R² :** {round(ml_results['r2'],3)}"
     )
 
 
 
 else:
 
+
     ml_results = None
 
 
     st.info(
-        "ℹ️ Train a model first to add ML results."
+        t.get(
+            "train_first",
+            "ℹ️ Train a model first."
+        )
     )
-
-
-
-st.divider()
 
 
 
@@ -174,29 +211,44 @@ st.divider()
 # CREATE PDF
 # ==========================
 
+st.divider()
+
+
+
 st.subheader(
-    "📄 Generate PDF"
+    t.get(
+        "create_report",
+        "📄 Create Report"
+    )
 )
 
 
 
 if st.button(
-    "🚀 Create PDF Report"
+    t.get(
+        "generate_pdf",
+        "🚀 Generate PDF"
+    )
 ):
 
 
     filename = generate_report(
+
         info,
+
         statistics,
+
         data,
+
+        username,
+
         ml_results
+
     )
 
 
 
-    # ==========================
     # SAVE HISTORY
-    # ==========================
 
     connection = sqlite3.connect(
         "database.db"
@@ -204,6 +256,7 @@ if st.button(
 
 
     cursor = connection.cursor()
+
 
 
     cursor.execute(
@@ -217,12 +270,14 @@ if st.button(
 
         VALUES (?, ?, ?)
         """,
+
         (
             username,
             filename,
             "Report"
         )
     )
+
 
 
     connection.commit()
@@ -236,7 +291,10 @@ if st.button(
 
 
     st.success(
-        "✅ Report created successfully!"
+        t.get(
+            "report_generated",
+            "✅ Report generated successfully"
+        )
     )
 
 
@@ -255,8 +313,12 @@ if "pdf_file" in st.session_state:
     st.divider()
 
 
+
     st.subheader(
-        "👁️ PDF Preview"
+        t.get(
+            "pdf_preview",
+            "👁️ PDF Preview"
+        )
     )
 
 
@@ -265,6 +327,7 @@ if "pdf_file" in st.session_state:
         filename,
         "rb"
     ) as pdf:
+
 
         pdf_bytes = pdf.read()
 
@@ -297,8 +360,16 @@ if "pdf_file" in st.session_state:
 
 
     st.download_button(
-        label="📥 Download PDF",
+
+        label=t.get(
+            "download_report",
+            "📥 Download PDF"
+        ),
+
         data=pdf_bytes,
+
         file_name=filename,
+
         mime="application/pdf"
+
     )

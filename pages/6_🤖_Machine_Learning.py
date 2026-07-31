@@ -3,6 +3,7 @@ import joblib
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+from src.logo import show_logo
 
 
 from sklearn.model_selection import train_test_split
@@ -18,6 +19,21 @@ from sklearn.metrics import (
     r2_score
 )
 
+from translations import translations
+
+
+
+# ==========================
+# LANGUAGE SYSTEM
+# ==========================
+
+language = st.session_state.get(
+    "language",
+    "Français"
+)
+
+t = translations[language]
+
 
 
 # ==========================
@@ -29,10 +45,12 @@ st.set_page_config(
     page_icon="🤖",
     layout="wide"
 )
+show_logo()
+
 
 
 st.title(
-    "🤖 Machine Learning"
+    t["machine_learning"]
 )
 
 
@@ -43,9 +61,11 @@ st.title(
 
 if "data" not in st.session_state:
 
+
     st.info(
-        "📂 Please upload data first."
+        t["upload_first"]
     )
+
 
     st.stop()
 
@@ -67,9 +87,11 @@ numeric_columns = data.select_dtypes(
 
 if len(numeric_columns) < 2:
 
+
     st.error(
-        "❌ Need at least two numeric columns."
+        t["warning_numeric"]
     )
+
 
     st.stop()
 
@@ -80,20 +102,20 @@ if len(numeric_columns) < 2:
 # ==========================
 
 st.subheader(
-    "⚙️ Select Data"
+    t["choose_model"]
 )
 
 
 
 target = st.selectbox(
-    "🎯 Target column",
+    t["target"],
     numeric_columns
 )
 
 
 
 features = st.multiselect(
-    "📌 Feature columns",
+    t["features"],
     [
         col for col in numeric_columns
         if col != target
@@ -104,9 +126,11 @@ features = st.multiselect(
 
 if len(features) == 0:
 
+
     st.warning(
-        "Please select features."
+        t["select_features"]
     )
+
 
     st.stop()
 
@@ -123,10 +147,15 @@ y = data[target]
 # ==========================
 
 X_train, X_test, y_train, y_test = train_test_split(
+
     X,
+
     y,
+
     test_size=0.2,
+
     random_state=42
+
 )
 
 
@@ -136,25 +165,28 @@ X_train, X_test, y_train, y_test = train_test_split(
 # ==========================
 
 st.subheader(
-    "🏆 Compare Models"
+    t["compare_models"]
 )
 
 
 
 if st.button(
-    "🚀 Compare All Models"
+    t["compare_all_models"]
 ):
 
 
     models = {
 
+
         "Linear Regression":
         LinearRegression(),
+
 
         "Decision Tree":
         DecisionTreeRegressor(
             random_state=42
         ),
+
 
         "Random Forest":
         RandomForestRegressor(
@@ -164,7 +196,9 @@ if st.button(
     }
 
 
+
     comparison_results = []
+
 
 
     for name, model_test in models.items():
@@ -193,19 +227,27 @@ if st.button(
         ) ** 0.5
 
 
+
         r2 = r2_score(
             y_test,
             prediction
         )
 
 
+
         comparison_results.append(
+
             {
                 "Model": name,
+
                 "MAE": round(mae,3),
+
                 "RMSE": round(rmse,3),
+
                 "R² Score": round(r2,3)
+
             }
+
         )
 
 
@@ -213,6 +255,7 @@ if st.button(
     comparison = pd.DataFrame(
         comparison_results
     )
+
 
 
     st.dataframe(
@@ -229,8 +272,10 @@ if st.button(
 
 
     st.success(
-        f"🏆 Best Model : {best['Model']} "
+
+        f"{t['best_model']} : {best['Model']} "
         f"(R² = {best['R² Score']})"
+
     )
 
 
@@ -240,18 +285,25 @@ if st.button(
 # ==========================
 
 st.subheader(
-    "🧠 Choose Model"
+    t["choose_model"]
 )
 
 
 
 model_name = st.selectbox(
+
     "Model",
+
     [
+
         "Linear Regression",
+
         "Decision Tree",
+
         "Random Forest"
+
     ]
+
 )
 
 
@@ -281,7 +333,7 @@ else:
 # ==========================
 
 if st.button(
-    "🚀 Train Model"
+    t["train"]
 ):
 
 
@@ -317,22 +369,16 @@ if st.button(
 
 
 
-    # ==========================
     # SAVE MODEL
-    # ==========================
 
+    if not os.path.exists("models"):
 
-    if not os.path.exists(
-        "models"
-    ):
-
-        os.makedirs(
-            "models"
-        )
+        os.makedirs("models")
 
 
 
     model_data = {
+
 
         "model": model,
 
@@ -347,18 +393,17 @@ if st.button(
 
 
     joblib.dump(
+
         model_data,
+
         "models/model.pkl"
+
     )
 
 
 
-    # ==========================
-    # SAVE RESULTS
-    # ==========================
-
-
     st.session_state["ml_results"] = {
+
 
         "model_name": model_name,
 
@@ -375,7 +420,7 @@ if st.button(
 
 
     st.success(
-        "✅ Model trained and saved!"
+        t["model_success"]
     )
 
 
@@ -385,8 +430,9 @@ if st.button(
     # ==========================
 
     st.subheader(
-        "📊 Model Performance"
+        t["performance"]
     )
+
 
 
     c1,c2,c3,c4 = st.columns(4)
@@ -394,25 +440,28 @@ if st.button(
 
 
     c1.metric(
-        "MAE",
+        t["mae"],
         round(mae,3)
     )
 
 
+
     c2.metric(
-        "RMSE",
+        t["rmse"],
         round(rmse,3)
     )
 
 
+
     c3.metric(
-        "R² Score",
+        t["r2"],
         round(r2,3)
     )
 
 
+
     c4.metric(
-        "Samples",
+        t["samples"],
         len(y_test)
     )
 
@@ -423,11 +472,13 @@ if st.button(
     # ==========================
 
     st.subheader(
-        "📈 Actual vs Prediction"
+        t["actual_prediction"]
     )
 
 
+
     fig, ax = plt.subplots()
+
 
 
     ax.scatter(
@@ -436,19 +487,17 @@ if st.button(
     )
 
 
+
     ax.set_xlabel(
-        "Actual Values"
+        "Actual"
     )
+
 
 
     ax.set_ylabel(
-        "Predicted Values"
+        "Prediction"
     )
 
-
-    ax.set_title(
-        "Actual vs Predicted"
-    )
 
 
     st.pyplot(fig)
@@ -460,56 +509,83 @@ if st.button(
     # ==========================
 
     if model_name in [
+
         "Decision Tree",
+
         "Random Forest"
+
     ]:
 
 
         st.subheader(
-            "🌳 Feature Importance"
+            t["feature_importance"]
         )
+
 
 
         importance = pd.DataFrame(
+
             {
+
                 "Feature": features,
-                "Importance": model.feature_importances_
+
+                "Importance":
+                model.feature_importances_
+
             }
+
         )
+
 
 
         importance = importance.sort_values(
+
             by="Importance",
+
             ascending=False
+
         )
+
 
 
         st.bar_chart(
+
             importance.set_index(
                 "Feature"
             )
+
         )
 
 
 
     # ==========================
-    # PREDICTIONS TABLE
+    # PREDICTIONS
     # ==========================
 
     st.subheader(
-        "🔮 Predictions"
+        t["predictions"]
     )
+
 
 
     result = pd.DataFrame(
+
         {
+
             "Actual": y_test,
+
             "Prediction": predictions
+
         }
+
     )
 
 
+
     st.dataframe(
+
         result,
+
         use_container_width=True
+
     )

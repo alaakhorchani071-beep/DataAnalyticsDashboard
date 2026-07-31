@@ -1,26 +1,54 @@
 import streamlit as st
 import sqlite3
-
 from src.upload import load_data
+from translations import translations
+from src.logo import show_logo
 
+
+
+# ==========================
+# LANGUAGE SYSTEM
+# ==========================
+
+language = st.session_state.get(
+    "language",
+    "Français"
+)
+
+t = translations[language]
+
+
+
+# ==========================
+# CONFIGURATION
+# ==========================
 
 st.set_page_config(
     page_title="Upload Data",
     page_icon="📂",
     layout="wide"
 )
+show_logo()
 
 
-st.title("📂 Upload your data")
+
+st.title(
+    t["upload"]
+)
 
 
-# Vérification connexion
+
+# ==========================
+# CHECK LOGIN
+# ==========================
 
 if "user" not in st.session_state:
 
+
     st.warning(
-        "⚠️ Please login first."
+        "⚠️ " + t["login"]
     )
+
 
     st.stop()
 
@@ -30,17 +58,29 @@ username = st.session_state["user"]
 
 
 
+# ==========================
+# INTRODUCTION
+# ==========================
+
 st.write(
-"""
-Import your CSV or Excel file to start analysis.
-"""
+    t["choose_file"]
 )
 
 
 
+# ==========================
+# FILE UPLOAD
+# ==========================
+
 uploaded_file = st.file_uploader(
-    "Choose a CSV or Excel file",
-    type=["csv", "xlsx"]
+
+    t["choose_file"],
+
+    type=[
+        "csv",
+        "xlsx"
+    ]
+
 )
 
 
@@ -48,33 +88,38 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
 
 
-    data = load_data(uploaded_file)
+    data = load_data(
+        uploaded_file
+    )
 
 
     if data is not None:
 
 
+
         st.success(
-            "✅ File uploaded successfully!"
+            t["success_upload"]
         )
 
 
 
-        # Sauvegarde dans la session
+        # Save data
 
         st.session_state["data"] = data
 
 
 
         # ==========================
-        # ENREGISTREMENT HISTORIQUE
+        # HISTORY
         # ==========================
 
         connection = sqlite3.connect(
             "database.db"
         )
 
+
         cursor = connection.cursor()
+
 
 
         cursor.execute(
@@ -91,6 +136,7 @@ if uploaded_file is not None:
                 "Analysis"
             )
         )
+
 
 
         exists = cursor.fetchone()
@@ -129,17 +175,18 @@ if uploaded_file is not None:
 
 
         # ==========================
-        # AFFICHAGE
+        # PREVIEW
         # ==========================
 
-
         st.subheader(
-            "📄 Data Preview"
+            t["data_preview"]
         )
 
 
+
         st.dataframe(
-            data
+            data,
+            use_container_width=True
         )
 
 
@@ -150,24 +197,33 @@ if uploaded_file is not None:
 
         with col1:
 
+
             st.metric(
-                "Rows",
+
+                t["rows"],
+
                 data.shape[0]
+
             )
 
 
 
         with col2:
 
+
             st.metric(
-                "Columns",
+
+                t["columns"],
+
                 data.shape[1]
+
             )
 
 
 
 else:
 
+
     st.info(
-        "Please upload a file."
+        t["upload_first"]
     )

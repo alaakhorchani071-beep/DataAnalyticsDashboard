@@ -1,5 +1,19 @@
 import streamlit as st
 import pandas as pd
+from translations import translations
+from PIL import Image
+import os
+
+# ==========================
+# LANGUAGE SYSTEM
+# ==========================
+
+language = st.session_state.get(
+    "language",
+    "Français"
+)
+
+t = translations[language]
 
 
 # ==========================
@@ -11,30 +25,42 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
+# ==========================
+# LOAD LOGO
+# ==========================
 
+logo_path = "logo.png.png"
 
+if os.path.exists(logo_path):
+
+    logo = Image.open(logo_path)
+
+else:
+
+    logo = None
+# ==========================
+# LOGO CENTER
+# ==========================
+
+if logo is not None:
+
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
+
+        st.image(
+            logo,
+            width=200
+        )
 st.title(
-    "📊 Data Analytics Dashboard"
+    t["title"]
 )
-
-
-
 # ==========================
 # INTRODUCTION
 # ==========================
 
 st.write(
-"""
-Welcome to the Data Analytics Dashboard 🚀
-
-This application allows you to:
-
-✅ Import and clean datasets  
-✅ Analyze data statistically  
-✅ Create visualizations  
-✅ Train Machine Learning models  
-✅ Generate professional PDF reports
-"""
+    t["description"]
 )
 
 
@@ -51,7 +77,7 @@ if "data" not in st.session_state:
 
 
     st.info(
-        "📂 Please upload a dataset to display dashboard information."
+        t["upload_first"]
     )
 
 
@@ -68,7 +94,7 @@ data = st.session_state["data"]
 # ==========================
 
 st.subheader(
-    "📌 Dataset Overview"
+    t["dataset_overview"]
 )
 
 
@@ -88,25 +114,25 @@ col1, col2, col3, col4 = st.columns(4)
 
 
 col1.metric(
-    "Rows",
+    t["rows"],
     rows
 )
 
 
 col2.metric(
-    "Columns",
+    t["columns"],
     columns
 )
 
 
 col3.metric(
-    "Missing Values",
+    t["missing"],
     missing
 )
 
 
 col4.metric(
-    "Duplicates",
+    t["duplicates"],
     duplicates
 )
 
@@ -121,8 +147,9 @@ st.divider()
 # ==========================
 
 st.subheader(
-    "👀 Data Preview"
+    t["data_preview"]
 )
+
 
 
 st.dataframe(
@@ -141,8 +168,9 @@ st.divider()
 # ==========================
 
 st.subheader(
-    "📋 Column Information"
+    t["column_information"]
 )
+
 
 
 info = pd.DataFrame(
@@ -155,6 +183,7 @@ info = pd.DataFrame(
 )
 
 
+
 st.dataframe(
     info,
     use_container_width=True
@@ -163,18 +192,23 @@ st.dataframe(
 
 
 st.divider()
+
+
+
 # ==========================
 # DATA INSIGHTS
 # ==========================
 
 st.subheader(
-    "💡 Data Insights"
+    t["data_insights"]
 )
+
 
 
 numeric_columns = data.select_dtypes(
     include=["number"]
 ).columns
+
 
 
 text_columns = data.select_dtypes(
@@ -188,21 +222,24 @@ col1, col2, col3, col4 = st.columns(4)
 
 
 col1.metric(
-    "🔢 Numeric Columns",
+    t["numeric_columns"],
     len(numeric_columns)
 )
 
 
+
 col2.metric(
-    "🔤 Text Columns",
+    t["text_columns"],
     len(text_columns)
 )
 
 
+
 col3.metric(
-    "💾 Dataset Size",
+    t["dataset_size"],
     f"{round(data.memory_usage().sum()/1024,2)} KB"
 )
+
 
 
 missing_column = (
@@ -212,17 +249,22 @@ missing_column = (
 )
 
 
+
 col4.metric(
-    "⚠️ Most Missing",
+    t["most_missing"],
     missing_column
 )
+
+
+
 # ==========================
 # AUTOMATIC CHART
 # ==========================
 
 st.subheader(
-    "📈 Automatic Visualization"
+    t["automatic_visualization"]
 )
+
 
 
 numeric = data.select_dtypes(
@@ -230,10 +272,12 @@ numeric = data.select_dtypes(
 )
 
 
+
 if len(numeric.columns) > 0:
 
+
     selected = st.selectbox(
-        "Choose numerical column",
+        t["choose_column"],
         numeric.columns
     )
 
@@ -242,17 +286,23 @@ if len(numeric.columns) > 0:
         numeric[selected]
     )
 
+
+
 else:
 
+
     st.info(
-        "No numerical columns available."
+        t["no_numeric"]
     )
+
+
+
 # ==========================
 # MACHINE LEARNING SUMMARY
 # ==========================
 
 st.subheader(
-    "🤖 Machine Learning Summary"
+    "🤖 Machine Learning"
 )
 
 
@@ -263,7 +313,9 @@ if "ml_results" in st.session_state:
     ml = st.session_state["ml_results"]
 
 
+
     c1, c2, c3 = st.columns(3)
+
 
 
     c1.metric(
@@ -272,8 +324,9 @@ if "ml_results" in st.session_state:
     )
 
 
+
     c2.metric(
-        "R² Score",
+        t["r2"],
         round(
             ml["r2"],
             3
@@ -281,8 +334,9 @@ if "ml_results" in st.session_state:
     )
 
 
+
     c3.metric(
-        "RMSE",
+        t["rmse"],
         round(
             ml["rmse"],
             3
@@ -290,7 +344,9 @@ if "ml_results" in st.session_state:
     )
 
 
+
 else:
+
 
     st.info(
         "ℹ️ No trained model available yet."
@@ -307,14 +363,13 @@ st.divider()
 # ==========================
 
 st.subheader(
-    "👩‍💻 Developer"
+    f"👩‍💻 {t['developer']}"
 )
+
 
 
 st.write(
 """
-Developed by:
-
 **Alaa Khorchani**
 
 Mathematics Applied - Data Science

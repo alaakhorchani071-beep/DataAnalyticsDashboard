@@ -1,17 +1,46 @@
+from PIL import Image
 from src.auth import login_user, register_user
 from src.database import create_database
+from translations import translations
 
 import streamlit as st
+import sqlite3
 
+
+# ==========================
+# CONFIGURATION
+# ==========================
 
 st.set_page_config(
     page_title="Data Analytics Dashboard",
     page_icon="📊",
     layout="wide"
 )
+logo = Image.open("logo.png.png")
+
+st.sidebar.image(
+    logo,
+    width=150
+)
 
 
 create_database()
+
+
+
+# ==========================
+# LANGUAGE SYSTEM
+# ==========================
+
+if "language" not in st.session_state:
+
+    st.session_state["language"] = "Français"
+
+
+
+t = translations[
+    st.session_state["language"]
+]
 
 
 
@@ -22,30 +51,38 @@ create_database()
 if "user" not in st.session_state:
 
 
-    st.sidebar.title("🔐 Compte")
+    st.sidebar.title(
+        t["account"]
+    )
 
 
     choice = st.sidebar.selectbox(
-        "Action",
+        t["account"],
         [
-            "Connexion",
-            "Créer un compte"
+            t["login"],
+            t["register"]
         ]
     )
 
 
+
     username = st.sidebar.text_input(
-        "Nom utilisateur"
+        t["username"]
     )
 
 
     password = st.sidebar.text_input(
-        "Mot de passe",
+        t["password"],
         type="password"
     )
 
 
-    if choice == "Créer un compte":
+
+    # ==========================
+    # REGISTER
+    # ==========================
+
+    if choice == t["register"]:
 
 
         email = st.sidebar.text_input(
@@ -54,7 +91,7 @@ if "user" not in st.session_state:
 
 
         language = st.sidebar.selectbox(
-            "🌍 Langue",
+            t["language"],
             [
                 "Français",
                 "English",
@@ -63,8 +100,9 @@ if "user" not in st.session_state:
         )
 
 
+
         if st.sidebar.button(
-            "Créer un compte"
+            t["register"]
         ):
 
 
@@ -76,30 +114,44 @@ if "user" not in st.session_state:
             )
 
 
+
             if result:
+
 
                 st.session_state["user"] = username
 
+                st.session_state["language"] = language
+
+
+
                 st.success(
-                    "Compte créé avec succès"
+                    translations[language]["register_success"]
                 )
+
 
                 st.rerun()
 
 
+
             else:
 
+
                 st.error(
-                    "Utilisateur existe déjà"
+                    translations[language]["user_exists"]
                 )
 
 
+
+
+    # ==========================
+    # LOGIN
+    # ==========================
 
     else:
 
 
         if st.sidebar.button(
-            "Connexion"
+            t["login"]
         ):
 
 
@@ -109,22 +161,67 @@ if "user" not in st.session_state:
             )
 
 
+
             if result:
+
 
                 st.session_state["user"] = username
 
-                st.success(
-                    "Connexion réussie"
+
+
+                # ==========================
+                # RECUPERATION LANGUE
+                # ==========================
+
+                connection = sqlite3.connect(
+                    "database.db"
                 )
+
+
+                cursor = connection.cursor()
+
+
+                cursor.execute(
+                    """
+                    SELECT language
+                    FROM users
+                    WHERE username = ?
+                    """,
+                    (username,)
+                )
+
+
+                user_language = cursor.fetchone()
+
+
+                connection.close()
+
+
+
+                if user_language:
+
+                    st.session_state["language"] = user_language[0]
+
+
+
+                st.success(
+                    translations[
+                        st.session_state["language"]
+                    ]["login_success"]
+                )
+
 
                 st.rerun()
 
 
+
             else:
 
+
                 st.error(
-                    "Identifiants incorrects"
+                    t["wrong_login"]
                 )
+
 
 
     st.stop()
@@ -136,31 +233,75 @@ if "user" not in st.session_state:
 # ==========================
 
 
+t = translations[
+    st.session_state["language"]
+]
+
+
+
 st.sidebar.success(
-    f"Bienvenue {st.session_state['user']} 👋"
+    f"{t['welcome']} {st.session_state['user']} 👋"
 )
 
 
 
-if st.sidebar.button(
-    "🚪 Déconnexion"
-):
+# ==========================
+# CHANGE LANGUAGE
+# ==========================
 
-    del st.session_state["user"]
+language = st.sidebar.selectbox(
+    t["language"],
+    [
+        "Français",
+        "English",
+        "العربية"
+    ],
+    index=[
+        "Français",
+        "English",
+        "العربية"
+    ].index(
+        st.session_state["language"]
+    )
+)
+
+
+
+if language != st.session_state["language"]:
+
+
+    st.session_state["language"] = language
+
 
     st.rerun()
 
 
 
+# ==========================
+# LOGOUT
+# ==========================
+
+if st.sidebar.button(
+    t["logout"]
+):
+
+
+    del st.session_state["user"]
+
+
+    st.rerun()
+
+
+
+
+# ==========================
+# HOME PAGE
+# ==========================
+
+
 st.title(
-    "📊 Data Analytics Dashboard"
+    t["title"]
 )
-
-
 st.write(
-    """
-Bienvenue dans votre application.
-
-Utilisez le menu à gauche pour accéder aux fonctionnalités.
-"""
+    t["description"]
 )

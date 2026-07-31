@@ -1,20 +1,48 @@
 import streamlit as st
 import sqlite3
+from src.logo import show_logo
+from translations import translations
 
+
+# ==========================
+# CONFIGURATION
+# ==========================
 
 st.set_page_config(
     page_title="Profile",
     page_icon="👤",
     layout="wide"
 )
+show_logo()
 
 
-st.title(
-    "👤 User Profile"
+# ==========================
+# LANGUAGE SYSTEM
+# ==========================
+
+language = st.session_state.get(
+    "language",
+    "Français"
 )
 
 
-# Vérification connexion
+t = translations[language]
+
+
+
+# ==========================
+# TITLE
+# ==========================
+
+st.title(
+    f"👤 {t['profile']}"
+)
+
+
+
+# ==========================
+# CHECK LOGIN
+# ==========================
 
 if "user" not in st.session_state:
 
@@ -30,7 +58,9 @@ username = st.session_state["user"]
 
 
 
-# Connexion base de données
+# ==========================
+# DATABASE CONNECTION
+# ==========================
 
 connection = sqlite3.connect(
     "database.db"
@@ -40,7 +70,9 @@ cursor = connection.cursor()
 
 
 
-# Récupérer les informations utilisateur
+# ==========================
+# GET USER INFORMATION
+# ==========================
 
 cursor.execute(
     """
@@ -56,7 +88,9 @@ user = cursor.fetchone()
 
 
 
-# Nombre d'analyses
+# ==========================
+# NUMBER OF ANALYSIS
+# ==========================
 
 cursor.execute(
     """
@@ -75,20 +109,23 @@ connection.close()
 
 
 
-# Affichage
+# ==========================
+# DISPLAY PROFILE
+# ==========================
 
 if user:
 
 
-    username, email, language, created_at = user
+    username, email, language_db, created_at = user
 
 
     st.success(
-        f"Welcome {username} 👋"
+        f"{t['welcome']} {username} 👋"
     )
 
 
     st.divider()
+
 
 
     col1, col2 = st.columns(2)
@@ -97,9 +134,10 @@ if user:
 
     with col1:
 
+
         st.info(
             f"""
-👤 Username
+👤 {t['username']}
 
 {username}
 """
@@ -121,9 +159,9 @@ if user:
 
         st.info(
             f"""
-🌍 Language
+🌍 {t['language']}
 
-{language}
+{language_db}
 """
         )
 
@@ -156,14 +194,18 @@ if user:
 
 else:
 
+
     st.error(
         "User not found"
     )
 
 
 
-st.divider()
+# ==========================
+# LANGUAGE SETTINGS
+# ==========================
 
+st.divider()
 
 
 st.subheader(
@@ -173,7 +215,7 @@ st.subheader(
 
 
 new_language = st.selectbox(
-    "🌍 Language",
+    t["language"],
     [
         "Français",
         "English",
@@ -183,25 +225,63 @@ new_language = st.selectbox(
         "Français",
         "English",
         "العربية"
-    ].index(language)
+    ].index(language_db)
 )
 
 
 
-if new_language != language:
+if new_language != language_db:
 
-    st.info(
-        "Language update will be added next."
+
+    connection = sqlite3.connect(
+        "database.db"
     )
 
 
+    cursor = connection.cursor()
+
+
+    cursor.execute(
+        """
+        UPDATE users
+        SET language = ?
+        WHERE username = ?
+        """,
+        (
+            new_language,
+            username
+        )
+    )
+
+
+    connection.commit()
+
+    connection.close()
+
+
+
+    st.session_state["language"] = new_language
+
+
+    st.success(
+        "✅ Language updated successfully!"
+    )
+
+
+    st.rerun()
+
+
+
+# ==========================
+# LOGOUT
+# ==========================
 
 st.divider()
 
 
 
 if st.button(
-    "🚪 Logout"
+    t["logout"]
 ):
 
     del st.session_state["user"]
